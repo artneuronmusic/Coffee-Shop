@@ -1,36 +1,19 @@
 import os
 from flask import Flask, request, jsonify, abort
-from sqlalchemy import exc
 import json
 from flask_cors import CORS
-from flask_cors import cross_origin
-from database.models import db_drop_and_create_all, setup_db, Drink
+from database.models import setup_db, Drink
 from auth.auth import requires_auth
 import sys
+#from flask_cors import cross_origin
+#from sqlalchemy import exc
 
 app = Flask(__name__)
 setup_db(app)
 CORS(app)
-# https://fsnd-coffeeshop-udacity.us.auth0.com/authorize?audience=coffee_shop&response_type=token&client_id=5KFAASKQvgBNfETwse5YTV9QWpBobQaL&redirect_uri=http://127.0.0.1:8000/login_result
 
-
-'''
-@TODO uncomment the following line to initialize the datbase
-!! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
-!! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
-!! Running this function will add one
-'''
 # db_drop_and_create_all()
 
-# ROUTES
-'''
-@TODO implement endpoint
-    GET /drinks
-        it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
 
 @app.route('/drinks', methods=['GET'])
 @requires_auth('get:drinks')
@@ -49,25 +32,15 @@ def get_drinks(payload):
         abort(404)
 
 
-'''
-@TODO implement endpoint
-    GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
-
-
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def get_drinks_explicit(payload):
-    # def get_drinks_explicit(payload):
+    
     drinks = Drink.query.all()
-    # print(drinks)
+  
     if len(drinks) > 0:
         drinks_long_detail = [i.long() for i in drinks]
-        # print(drinks_long_detail)
+
         return jsonify({
             'status_code': 200,
             "success": True,
@@ -76,8 +49,6 @@ def get_drinks_explicit(payload):
         })
     else:
         abort(404)
-
-
 '''
 @TODO implement endpoint
     POST /drinks
@@ -92,7 +63,7 @@ def get_drinks_explicit(payload):
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def add_new_drink(payload):
-    # def add_new_drink(payload):
+   
     body = request.get_json()
     print(body)
 
@@ -100,9 +71,6 @@ def add_new_drink(payload):
 
         new_title = body.get('title', None)
         new_recipe = body.get('recipe', None)
-        # the recipe is a list but in the Drink which requires string for the recipe dictionary, so use dumps
-        # loads =>used for turn into python form
-        #new_drink = Drink(title=new_title, recipe=new_recipe)
         new_drink = Drink(title=new_title, recipe=json.dumps(new_recipe))
         drink = new_drink.long()
         new_drink.insert()
@@ -114,27 +82,11 @@ def add_new_drink(payload):
         })
 
     except:
-        # print(sys.exc_info())
         abort(400)
-
-
-'''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
-'''
-
 
 @app.route('/drinks/<int:drink_id>', methods=['PATCH'])
 @requires_auth('patch:update-drinks')
 def update_specific_drink(payload, drink_id):
-    # def update_specific_drink(payload, drink_id):
     specific_drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
     if specific_drink is None:
         abort(404)
@@ -154,23 +106,11 @@ def update_specific_drink(payload, drink_id):
             })
         except:
             abort(400)
-            # print(sys.exc_info())
-
-'''
-@TODO implement endpoint
-    DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
-'''
+       
 
 @app.route('/drinks/<int:drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def delete_drink(payload, drink_id):
-    # def delete_drink(payload, drink_id):
 
     specific_drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
     if specific_drink is None:
@@ -184,11 +124,6 @@ def delete_drink(payload, drink_id):
             "delete": drink_id
 
         })
-
-        # Error Handling
-'''
-Example error handling for unprocessable entity
-'''
 
 
 @ app.errorhandler(404)
