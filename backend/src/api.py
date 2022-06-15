@@ -14,11 +14,10 @@ CORS(app)
 
 # db_drop_and_create_all()
 
-
 @app.route('/drinks', methods=['GET'])
 @requires_auth('get:drinks')
 def get_drinks(payload):
-    # print(payload)
+    print(payload)
     drinks = Drink.query.all()
     if len(drinks) > 0:
         drinks_short_detail = [i.short() for i in drinks]
@@ -121,7 +120,7 @@ def delete_drink(payload, drink_id):
         return jsonify({
             "status_code": 200,
             "success": True,
-            "delete": drink_id
+            "delete_drink": drink_id
 
         })
 
@@ -169,4 +168,4 @@ def server_error(error):
 
 
 if __name__ == '__main__':
-    app.run(port=8000, debug=True)
+    app.run(host="0.0.0.0", port=8000, debug=True)

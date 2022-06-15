@@ -10,8 +10,7 @@ AUTH0_DOMAIN = 'fsnd-coffeeshop-udacity.us.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'coffee_shop'
 
-
-
+#https://fsnd-coffeeshop-udacity.us.auth0.com/authorize?audience=coffee_shop&scope=SCOPE&response_type=token&client_id=5KFAASKQvgBNfETwse5YTV9QWpBobQaL&redirect_uri=http://127.0.0.1:8000/login_result
 class AuthError(Exception):
     def __init__(self, error, status_code):
         self.error = error
@@ -24,6 +23,7 @@ class AuthError(Exception):
 def get_token_auth_header():
    
     auth = request.headers.get('Authorization', None)
+    print(auth)
     if not auth:
         raise AuthError({
             'code': 'authorization_header_missing',
