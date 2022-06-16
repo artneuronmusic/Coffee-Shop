@@ -13,5 +13,5 @@ test.db
 ehthumbs.db
 Thumbs.db
 lesson3/
-env/
+.vagrant/
 
